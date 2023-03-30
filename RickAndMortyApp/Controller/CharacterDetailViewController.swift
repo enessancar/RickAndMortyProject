@@ -24,7 +24,7 @@ class CharacterDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        characterImage.layer.cornerRadius = 14
+        characterImage.layer.cornerRadius = 10
         
         let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor(hex: "#4FADC8")]
         navigationController?.navigationBar.titleTextAttributes = textAttributes

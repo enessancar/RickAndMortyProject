@@ -9,6 +9,7 @@ import UIKit
 
 class CharacterTableViewCell: UITableViewCell {
     
+    //MARK: - Properties
     @IBOutlet weak var characterImageView: UIImageView!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var statusLabel: UILabel!
@@ -28,6 +29,4 @@ class CharacterTableViewCell: UITableViewCell {
         nameLabel.text = nil
         statusLabel.text = nil
     }
-    
-
 }
