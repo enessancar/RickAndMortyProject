@@ -53,17 +53,15 @@ class CharacterDetailViewController: UIViewController {
         genderLabel.text = selectedCharacter.gender.rawValue
         originLabel.text = selectedCharacter.origin.name
         locationLabel.text = selectedCharacter.location.name
-        epiaodesLabel.text = selectedCharacter.episode.first
+        epiaodesLabel.text = selectedCharacter.episode.last
         
-        let dateString = selectedCharacter.created
-        
+        let apiDateString = selectedCharacter.created
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        let date = dateFormatter.date(from: apiDateString)
         
-        if let date = dateFormatter.date(from: dateString) {
-            dateFormatter.dateFormat = "EEEE, MMM d, yyyy"
-            _ = dateFormatter.string(from: date)
-            createdLabel.text = dateString
-        }
+        dateFormatter.dateFormat = "dd.MM.yyyy - HH:mm"
+        let formattedDateString = dateFormatter.string(from: date!)
+        createdLabel.text = formattedDateString
     }
 }

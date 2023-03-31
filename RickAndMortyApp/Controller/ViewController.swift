@@ -23,6 +23,8 @@ class ViewController: UIViewController {
     var locations: [RMLocation] = []
     var characters: [RMCharacter] = []
     
+    private var apiInfo: RMGetAllCharactersResponse.Info? = nil
+    
     //MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,7 +58,9 @@ class ViewController: UIViewController {
             switch result {
             case .success(let responseModel):
                 let results = responseModel.results
+                let info = responseModel.info
                 self?.characters = results
+                self?.apiInfo = info
                 DispatchQueue.main.async {
                     self?.tableView.reloadData()
                 }
@@ -64,6 +68,52 @@ class ViewController: UIViewController {
                 print(String(describing: error))
             }
         }
+    }
+    
+    private var isLoadingMoreCharacters = false
+    
+    // Aşşağı kaydırdıkça tüm karakterler geliyor ama colleciton view cell deki name bastığımda  eşleşenlerin filtrelenip öyle gelmesi lazım
+    
+    public func fetchAdditionalCharacters(url: URL) {
+        guard !isLoadingMoreCharacters else {
+            return
+        }
+        
+        isLoadingMoreCharacters = true
+       guard let request = RMRequest(url: url) else {
+            isLoadingMoreCharacters = false
+            return
+        }
+        
+       RMService.shared.execute(request, expecting: RMGetAllCharactersResponse.self) { [weak self] result in
+           guard let strongSelf = self else {
+               return
+           }
+           switch result {
+           case .success(let responseModel):
+               let moreResults = responseModel.results
+               let info = responseModel.info
+               strongSelf.apiInfo = info
+               
+               let originalCount = strongSelf.characters.count
+               let newCount = moreResults.count
+               let total = originalCount+newCount
+               let startingIndex = total - newCount
+               let indexPathsToAdd: [IndexPath] = Array(startingIndex..<(startingIndex+newCount)).compactMap({
+                   return IndexPath(row: $0, section: 0)
+               })
+            
+               strongSelf.characters.append(contentsOf: moreResults)
+               DispatchQueue.main.async {
+                   self?.tableView.reloadData()
+                   strongSelf.isLoadingMoreCharacters = false
+                  }
+               
+           case .failure(let failure):
+               print(String(describing: failure))
+               self?.isLoadingMoreCharacters = false
+           }
+       }
     }
     
     // Deneme amaçlı  locaiton name basınca aşağıda o location daki karakterleri listelemek için
@@ -115,6 +165,7 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate {
         let location = locations[indexPath.item]
         let character = characters[indexPath.row]
         
+        // eşleşenler ile locaiton name characterler liste güncellenmeli
         if location.id == character.id {
             print("eşleşti")
             DispatchQueue.main.async {
@@ -171,6 +222,27 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
                 let destinationVC = segue.destination as! CharacterDetailViewController
                 destinationVC.selectedCharacter = character
             }
+        }
+    }
+}
+
+//MARK: - ScrollViewDelegate Control
+extension ViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard !isLoadingMoreCharacters,
+        let nextUrlString = apiInfo?.next,
+        let url = URL(string: nextUrlString) else {
+            return
+        }
+        Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { [weak self] t in
+            let offset = scrollView.contentOffset.y
+            let totalContentHeigh = scrollView.contentSize.height
+            let totalScrollViewFixedHeight = scrollView.frame.size.height
+          
+            if offset >= (totalContentHeigh - totalScrollViewFixedHeight - 120) {
+                self?.fetchAdditionalCharacters(url: url)
+            }
+            t.invalidate()
         }
     }
 }
