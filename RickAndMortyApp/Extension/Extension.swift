@@ -35,3 +35,16 @@ extension UIColor {
     }
 }
 
+extension UIViewController {
+    func showAlert(alertText : String, alertMessage : String) {
+        let alert = UIAlertController(title: alertText, message: alertMessage, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Okey",style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
+}
+
+extension String {
+    var asUrl: URL? {
+        return URL(string: self)
+    }
+}

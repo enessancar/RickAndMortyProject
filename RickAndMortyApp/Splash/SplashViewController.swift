@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SplashViewController: UIViewController {
+final class SplashViewController: UIViewController {
     
     //MARK: - Properties
     @IBOutlet weak var imageView: UIImageView!
@@ -15,7 +15,6 @@ class SplashViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
             self?.performSegue(withIdentifier: "mainVC", sender: nil)
         }

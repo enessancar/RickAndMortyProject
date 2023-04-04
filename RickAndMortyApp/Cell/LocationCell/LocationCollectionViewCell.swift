@@ -7,14 +7,15 @@
 
 import UIKit
 
-class LocationCollectionViewCell: UICollectionViewCell {
+final class LocationCollectionViewCell: UICollectionViewCell {
+    static let cellIdentifier = "locationCell"
     
     //MARK: - Properties
     @IBOutlet weak var nameLabel: UILabel!
     
     override var isSelected: Bool {
         didSet {
-            contentView.backgroundColor = isSelected ? .systemBlue : .systemGray6
+            contentView.backgroundColor = isSelected ? .systemBlue : .systemGray5
         }
     }
     

@@ -6,10 +6,13 @@
 //
 
 import UIKit
+import Kingfisher
 
-class CharacterDetailViewController: UIViewController {
+final class CharacterDetailViewController: UIViewController {
     
     //MARK: - Properties
+    @IBOutlet weak var replyStackView: UIStackView!
+    @IBOutlet weak var titleStackView: UIStackView!
     
     @IBOutlet weak var characterImage: UIImageView!
     @IBOutlet weak var statusLabel: UILabel!
@@ -22,38 +25,41 @@ class CharacterDetailViewController: UIViewController {
     
     var selectedCharacter: RMCharacter!
     
+    //MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        setUpNavigationBar()
         characterImage.layer.cornerRadius = 10
-        
-        let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor(hex: "#4FADC8")]
-        navigationController?.navigationBar.titleTextAttributes = textAttributes
-        
-        title = selectedCharacter.name
         fetchData()
+    }
+    
+    override var shouldAutorotate: Bool {
+        return true
+    }
+    
+    //MARK: - Private Func
+    
+    private func setUpNavigationBar() {
+        self.navigationItem.title = selectedCharacter.name
+        self.navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor(hex: "#4FADC8"), .font: UIFont(name: "Avenir Medium", size: 22)!]
     }
     
     private func fetchData() {
         
-        guard let imageUrl = URL(string: selectedCharacter.image) else {
-            fatalError()
-        }
-        RMImageLoader.shared.downloadImage(imageUrl) { result in
-            switch result {
-            case.success(let data):
-                DispatchQueue.main.async {
-                    self.characterImage.image = UIImage(data: data)
-                }
-            case .failure(let error):
-                print(error)
-            }
-        }
+        characterImage.kf.setImage(with: selectedCharacter.image.asUrl)
         statusLabel.text = selectedCharacter.status.text
         specyLabel.text = selectedCharacter.species
         genderLabel.text = selectedCharacter.gender.rawValue
         originLabel.text = selectedCharacter.origin.name
         locationLabel.text = selectedCharacter.location.name
-        epiaodesLabel.text = selectedCharacter.episode.last
+        
+        let episodesNumbers = selectedCharacter.episode.map {
+            $0.split(separator: "/").last
+        }.compactMap { $0 }.joined(separator: ",")
+        
+        DispatchQueue.main.async {
+            self.epiaodesLabel.text = episodesNumbers
+        }
         
         let apiDateString = selectedCharacter.created
         let dateFormatter = DateFormatter()

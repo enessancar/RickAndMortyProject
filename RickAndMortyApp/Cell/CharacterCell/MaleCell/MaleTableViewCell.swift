@@ -1,32 +1,31 @@
 //
-//  CharacterTableViewCell.swift
+//  MaleTableViewCell.swift
 //  RickAndMortyApp
 //
-//  Created by Enes Sancar on 25.03.2023.
+//  Created by Enes Sancar on 1.04.2023.
 //
 
 import UIKit
 
-class CharacterTableViewCell: UITableViewCell {
-    
+final class MaleTableViewCell: UITableViewCell {
+    static let identifier = "MaleTableViewCell"
+
     //MARK: - Properties
-    @IBOutlet weak var characterImageView: UIImageView!
     @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var characterImageView: UIImageView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        characterImageView.layer.cornerRadius = 12
+        characterImageView.layer.cornerRadius = 8
     }
-
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        characterImageView.image = nil
         nameLabel.text = nil
-        statusLabel.text = nil
+        characterImageView.image = nil
     }
 }
